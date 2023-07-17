@@ -1,5 +1,6 @@
 package de.lojaw.module;
 
+import de.lojaw.event.KeyInputHandler;
 import de.lojaw.module.impl.SprintModule;
 
 import java.util.HashMap;
@@ -27,6 +28,16 @@ public class ModuleManager {
         Module module = getModule(name);
         if (module != null) {
             module.setEnabled(true);
+
+            // Nur registrieren, wenn der Keybind nicht -1 ist
+            if (module.getToggleKey() != -1) {
+                KeyInputHandler.register(module, module.getToggleKey());
+            }
+
+            // Nur registrieren, wenn der Keybind nicht -1 ist
+            if (module.getHoldKey() != -1) {
+                KeyInputHandler.register(module, module.getHoldKey());
+            }
         }
     }
 
@@ -37,10 +48,17 @@ public class ModuleManager {
         }
     }
 
-    public void toggleModule(String name) {
+    public void setModuleToggleKey(String name, int keybind) {
         Module module = getModule(name);
         if (module != null) {
-            module.toggle();
+            module.setToggleKey(keybind);
+        }
+    }
+
+    public void setModuleHoldKey(String name, int keybind) {
+        Module module = getModule(name);
+        if (module != null) {
+            module.setHoldKey(keybind);
         }
     }
 

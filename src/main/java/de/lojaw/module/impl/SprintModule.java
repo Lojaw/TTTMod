@@ -3,46 +3,32 @@ package de.lojaw.module.impl;
 import de.lojaw.module.Module;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
 
 public class SprintModule implements Module {
-    private final String name = "Sprint";
-    private boolean enabled = false;
-    private int keybind;
+
+    private String name;
+    private boolean isEnabled = false;
+    private int toggleKey = -1; // -1 bedeutet nicht gesetzt
+    private int holdKey = -1; // -1 bedeutet nicht gesetzt
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return this.isEnabled;
     }
 
     @Override
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-        if (enabled) {
-            onEnable();
+    public void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
+        if (isEnabled) {
+            this.onEnable();
         } else {
-            onDisable();
+            this.onDisable();
         }
-    }
-
-    @Override
-    public void toggle() {
-        enabled = !enabled;
-    }
-
-    @Override
-    public void setKeybind(int keybind) {
-        this.keybind = keybind;
-    }
-
-    @Override
-    public int getKeybind() {
-        return keybind;
     }
 
     @Override
@@ -59,6 +45,26 @@ public class SprintModule implements Module {
         if (player != null) {
             player.setSprinting(false);
         }
+    }
+
+    @Override
+    public void setToggleKey(int keybind) {
+        this.toggleKey = keybind;
+    }
+
+    @Override
+    public int getToggleKey() {
+        return toggleKey;
+    }
+
+    @Override
+    public void setHoldKey(int keybind) {
+        this.holdKey = keybind;
+    }
+
+    @Override
+    public int getHoldKey() {
+        return holdKey;
     }
 }
 
