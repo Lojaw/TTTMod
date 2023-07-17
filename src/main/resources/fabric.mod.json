@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "tttmod",
+	"version": "${version}",
+	"name": "TTTMod",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Lojaw"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/tttmod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+          "de.lojaw.TTTMod"
+		],
+		"client": [
+			"de.lojaw.TTTModClient"
+		]
+	},
+	"mixins": [
+		"tttmod.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.21",
+		"minecraft": "~1.19.4",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
