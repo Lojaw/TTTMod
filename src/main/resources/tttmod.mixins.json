@@ -3,7 +3,8 @@
 	"package": "de.lojaw.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
+		"ExampleMixin",
+		"SprintMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
