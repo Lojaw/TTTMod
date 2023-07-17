@@ -14,10 +14,8 @@ import net.minecraft.util.Formatting;
 public class TTTModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             if (!client.isInSingleplayer()) {
-
                 // Sende eine Nachricht an den Spieler
                 client.execute(() -> {
                     assert MinecraftClient.getInstance().player != null;
@@ -27,48 +25,25 @@ public class TTTModClient implements ClientModInitializer {
         });
 
         ClientSendMessageEvents.ALLOW_CHAT.register((message) -> {
-            // Überprüfung, ob die Nachricht dem mod Präfix entspricht
             if (!MinecraftClient.getInstance().isInSingleplayer() && message.startsWith(".tttmod")) {
                 String[] args = message.split(" ");
                 PlayerEntity player = MinecraftClient.getInstance().player;
 
                 if (args.length > 1) {
-                    if (args[1].equalsIgnoreCase("enable")) {
-                        // Stelle sicher, dass args[2] existiert, bevor darauf zugegriffen wird
-                        if (args.length > 2) {
-                            String moduleName = args[2];
-                            Module module = ModuleManager.getInstance().getModule(moduleName);
+                    String command = args[1].toLowerCase();
 
-                            if (module != null) {
-                                ModuleManager.getInstance().enableModule(moduleName);
-
-                                if (player != null) {
-                                    Text messageText = Text.of("[TTTMod] Das Modul " + moduleName + " wurde aktiviert.");
-                                    Style style = messageText.getStyle().withColor(Formatting.GREEN);
-                                    messageText = messageText.copy().setStyle(style);
-
-                                    player.sendMessage(messageText, false);
-                                }
-                            } else {
-                                if (player != null) {
-                                    player.sendMessage(Text.of("[TTTMod] Das Modul " + moduleName + " existiert nicht."), false);
-                                }
-                            }
-
-                            return false; // verhindert das Senden der Nachricht an den Server
-                        } else {
+                    switch (command) {
+                        case "enable":
+                            handleEnableCommand(args, player);
+                            return false;
+                        case "disable":
+                            handleDisableCommand(args, player);
+                            return false;
+                        default:
                             if (player != null) {
-                                player.sendMessage(Text.of("[TTTMod] Kein Modulname angegeben."), false);
+                                player.sendMessage(Text.of("[TTTMod] Unbekannter Befehl."), false);
                             }
-
-                            return false; // verhindert das Senden der Nachricht an den Server
-                        }
-                    } else {
-                        if (player != null) {
-                            player.sendMessage(Text.of("[TTTMod] Unbekannter Befehl."), false);
-                        }
-
-                        return false; // verhindert das Senden der Nachricht an den Server
+                            return false;
                     }
                 } else {
                     // Liste von Befehlen senden
@@ -76,13 +51,65 @@ public class TTTModClient implements ClientModInitializer {
                         player.sendMessage(Text.of("[TTTMod] Liste der verfügbaren Befehle:"), false);
                         // TODO: Liste der verfügbaren Befehle
                     }
-
-                    return false; // verhindert das Senden der Nachricht an den Server
+                    return false;
                 }
             }
-
             // Wenn die Nachricht nicht mit .tttmod beginnt, wird sie normal gesendet
             return true;
         });
+    }
+
+    private void handleEnableCommand(String[] args, PlayerEntity player) {
+        if (args.length > 2) {
+            String moduleName = args[2];
+            Module module = ModuleManager.getInstance().getModule(moduleName);
+
+            if (module != null) {
+                ModuleManager.getInstance().enableModule(moduleName);
+
+                if (player != null) {
+                    Text messageText = Text.of("[TTTMod] Das Modul " + moduleName + " wurde aktiviert.");
+                    Style style = messageText.getStyle().withColor(Formatting.GREEN);
+                    messageText = messageText.copy().setStyle(style);
+
+                    player.sendMessage(messageText, false);
+                }
+            } else {
+                if (player != null) {
+                    player.sendMessage(Text.of("[TTTMod] Das Modul " + moduleName + " existiert nicht."), false);
+                }
+            }
+        } else {
+            if (player != null) {
+                player.sendMessage(Text.of("[TTTMod] Kein Modulname angegeben."), false);
+            }
+        }
+    }
+
+    private void handleDisableCommand(String[] args, PlayerEntity player) {
+        if (args.length > 2) {
+            String moduleName = args[2];
+            Module module = ModuleManager.getInstance().getModule(moduleName);
+
+            if (module != null) {
+                ModuleManager.getInstance().disableModule(moduleName);
+
+                if (player != null) {
+                    Text messageText = Text.of("[TTTMod] Das Modul " + moduleName + " wurde deaktiviert.");
+                    Style style = messageText.getStyle().withColor(Formatting.RED);
+                    messageText = messageText.copy().setStyle(style);
+
+                    player.sendMessage(messageText, false);
+                }
+            } else {
+                if (player != null) {
+                    player.sendMessage(Text.of("[TTTMod] Das Modul " + moduleName + " existiert nicht."), false);
+                }
+            }
+        } else {
+            if (player != null) {
+                player.sendMessage(Text.of("[TTTMod] Kein Modulname angegeben."), false);
+            }
+        }
     }
 }
