@@ -6,6 +6,7 @@ import de.lojaw.module.impl.ClickGUIModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -72,4 +73,57 @@ public class ClickGUI extends Screen {
         messageText = messageText.copy().setStyle(style);
         textRenderer.draw(matrices, messageText, x, y, color);
     }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (!this.shouldPause()) {
+            assert this.client != null;
+            if (this.client.player != null) {
+                KeyBinding forwardKey = MinecraftClient.getInstance().options.forwardKey;
+                KeyBinding backKey = MinecraftClient.getInstance().options.backKey;
+                KeyBinding leftKey = MinecraftClient.getInstance().options.leftKey;
+                KeyBinding rightKey = MinecraftClient.getInstance().options.rightKey;
+                KeyBinding jumpKey = MinecraftClient.getInstance().options.jumpKey;
+
+                if (forwardKey.matchesKey(keyCode, scanCode)) {
+                    forwardKey.setPressed(true);
+                } else if (backKey.matchesKey(keyCode, scanCode)) {
+                    backKey.setPressed(true);
+                } else if (leftKey.matchesKey(keyCode, scanCode)) {
+                    leftKey.setPressed(true);
+                } else if (rightKey.matchesKey(keyCode, scanCode)) {
+                    rightKey.setPressed(true);
+                } else if (jumpKey.matchesKey(keyCode, scanCode)) {
+                    jumpKey.setPressed(true);
+                    jumpKey.setPressed(false);
+                }
+            }
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        if (!this.shouldPause()) {
+            assert this.client != null;
+            if (this.client.player != null) {
+                KeyBinding forwardKey = MinecraftClient.getInstance().options.forwardKey;
+                KeyBinding backKey = MinecraftClient.getInstance().options.backKey;
+                KeyBinding leftKey = MinecraftClient.getInstance().options.leftKey;
+                KeyBinding rightKey = MinecraftClient.getInstance().options.rightKey;
+
+                if (forwardKey.matchesKey(keyCode, scanCode) || backKey.matchesKey(keyCode, scanCode)) {
+                    forwardKey.setPressed(false);
+                    backKey.setPressed(false);
+                } else if (leftKey.matchesKey(keyCode, scanCode) || rightKey.matchesKey(keyCode, scanCode)) {
+                    leftKey.setPressed(false);
+                    rightKey.setPressed(false);
+                }
+            }
+        }
+
+        return super.keyReleased(keyCode, scanCode, modifiers);
+    }
+
 }

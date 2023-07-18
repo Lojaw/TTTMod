@@ -20,17 +20,17 @@ public class TTTModClient implements ClientModInitializer {
         ModuleManager.getInstance().registerModulesAndKeybindings();
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            if (!client.isInSingleplayer()) {
+            //if (!client.isInSingleplayer()) {
                 // Sende eine Nachricht an den Spieler
                 client.execute(() -> {
                     assert MinecraftClient.getInstance().player != null;
                     MinecraftClient.getInstance().player.sendMessage(Text.of("[TTTMod] Die Mod wurde geladen"), false);
                 });
-            }
+            //}
         });
 
         ClientSendMessageEvents.ALLOW_CHAT.register((message) -> {
-            if (!MinecraftClient.getInstance().isInSingleplayer() && message.startsWith(".tttmod")) {
+            //if (!MinecraftClient.getInstance().isInSingleplayer() && message.startsWith(".tttmod")) {
                 String[] args = message.split(" ");
                 PlayerEntity player = MinecraftClient.getInstance().player;
 
@@ -58,9 +58,8 @@ public class TTTModClient implements ClientModInitializer {
                     }
                     return false;
                 }
-            }
+            //}
             // Wenn die Nachricht nicht mit .tttmod beginnt, wird sie normal gesendet
-            return true;
         });
     }
 

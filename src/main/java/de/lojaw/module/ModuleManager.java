@@ -1,7 +1,10 @@
 package de.lojaw.module;
 
 import de.lojaw.event.KeyInputHandler;
+import de.lojaw.gui.clickgui.ClickGUI;
 import de.lojaw.module.impl.ClickGUIModule;
+import de.lojaw.module.impl.FlyModule;
+import de.lojaw.module.impl.FullbrightModule;
 import de.lojaw.module.impl.SprintModule;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -34,6 +37,12 @@ public class ModuleManager {
         ClickGUIModule clickGUIModule = ClickGUIModule.getInstance();
         modules.put("Click GUI", clickGUIModule);
 
+        FlyModule flyModule = new FlyModule();
+        modules.put("Fly", flyModule);
+
+        FullbrightModule fullbrightModuleModule = new FullbrightModule();
+        modules.put("Fullbright", fullbrightModuleModule);
+
         // Register keybindings
         if (sprintModule.getKey() != -1) {
             String keyId = "key.tttmod." + sprintModule.getName();
@@ -59,6 +68,30 @@ public class ModuleManager {
             clickGUIModule.setKeyBinding(keyBinding);
         }
 
+        if (clickGUIModule.getKey() != -1) {
+            String keyId = "key.tttmod." + flyModule.getName();
+            KeyBinding keyBinding = new KeyBinding(
+                    keyId,
+                    InputUtil.Type.KEYSYM,
+                    flyModule.getKey(),
+                    KeyInputHandler.KEY_CATEGORY_TTTMOD
+            );
+            KeyBindingHelper.registerKeyBinding(keyBinding);
+            flyModule.setKeyBinding(keyBinding);
+        }
+
+        if (fullbrightModuleModule.getKey() != -1) {
+            String keyId = "key.tttmod." + fullbrightModuleModule.getName();
+            KeyBinding keyBinding = new KeyBinding(
+                    keyId,
+                    InputUtil.Type.KEYSYM,
+                    fullbrightModuleModule.getKey(),
+                    KeyInputHandler.KEY_CATEGORY_TTTMOD
+            );
+            KeyBindingHelper.registerKeyBinding(keyBinding);
+            fullbrightModuleModule.setKeyBinding(keyBinding);
+        }
+
         // Register event handlers
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.world != null) {
@@ -72,8 +105,33 @@ public class ModuleManager {
                         }
                     }
                 }
+
+                if (ClickGUI.getInstance().isOpen() && !ClickGUIModule.getInstance().getShouldPauseGame()) {
+                    // Wenn das Click GUI offen ist und das Spiel nicht pausiert werden soll...
+
+                    // ... führen Sie hier die Aktionen aus, die Sie ausführen möchten.
+
+                    // Zum Beispiel: Wenn die W-Taste gedrückt ist, setzen Sie forwardSpeed auf 1.0F
+
+                    if(client.player != null) {
+                        if (client.options.forwardKey.isPressed()) {
+                            assert client.player != null;
+                            client.player.forwardSpeed = 2.0F;
+                        }
+
+                        if (client.options.jumpKey.isPressed()) {
+                            client.player.jump();
+                        }
+                    }
+
+                    // Ähnlich können Sie prüfen, ob andere Tasten gedrückt sind und entsprechende Aktionen ausführen.
+                }
+
             }
         });
+
+
+
     }
 
 
