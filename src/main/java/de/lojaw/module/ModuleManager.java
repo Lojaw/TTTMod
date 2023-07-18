@@ -105,28 +105,6 @@ public class ModuleManager {
                         }
                     }
                 }
-
-                if (ClickGUI.getInstance().isOpen() && !ClickGUIModule.getInstance().getShouldPauseGame()) {
-                    // Wenn das Click GUI offen ist und das Spiel nicht pausiert werden soll...
-
-                    // ... führen Sie hier die Aktionen aus, die Sie ausführen möchten.
-
-                    // Zum Beispiel: Wenn die W-Taste gedrückt ist, setzen Sie forwardSpeed auf 1.0F
-
-                    if(client.player != null) {
-                        if (client.options.forwardKey.isPressed()) {
-                            assert client.player != null;
-                            client.player.forwardSpeed = 2.0F;
-                        }
-
-                        if (client.options.jumpKey.isPressed()) {
-                            client.player.jump();
-                        }
-                    }
-
-                    // Ähnlich können Sie prüfen, ob andere Tasten gedrückt sind und entsprechende Aktionen ausführen.
-                }
-
             }
         });
 
