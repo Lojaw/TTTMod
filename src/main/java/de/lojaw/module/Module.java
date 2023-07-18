@@ -1,13 +1,19 @@
 package de.lojaw.module;
 
+import net.minecraft.client.option.KeyBinding;
+
 public interface Module {
     String getName();
+    Category getCategory();
     boolean isEnabled();
     void setEnabled(boolean isEnabled);
     void onEnable();
     void onDisable();
-    void setToggleKey(int keybind); // Umschalten (ein/aus)
-    int getToggleKey();
-    void setHoldKey(int keybind); // Nur solange aktiv, wenn die Taste gedrückt wird
-    int getHoldKey();
+    void setKey(int key);
+    int getKey();
+    void setKeyBinding(KeyBinding keyBinding);
+    KeyBinding getKeyBinding();
+    void setMode(String mode);
+    String getMode();
+    void handleKeyInput();
 }

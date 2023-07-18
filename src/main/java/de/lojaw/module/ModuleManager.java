@@ -1,8 +1,18 @@
 package de.lojaw.module;
 
 import de.lojaw.event.KeyInputHandler;
+import de.lojaw.module.impl.ClickGUIModule;
 import de.lojaw.module.impl.SprintModule;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,9 +23,59 @@ public class ModuleManager {
 
     // Privater Konstruktor, verhindert die Erstellung von Instanzen von außerhalb dieser Klasse
     private ModuleManager() {
-        // Registrieren der Module
-        modules.put("Sprint", new SprintModule());
+        // Do nothing here
     }
+
+    public void registerModulesAndKeybindings() {
+        // Register modules
+        SprintModule sprintModule = new SprintModule();
+        modules.put("Sprint", sprintModule);
+
+        ClickGUIModule clickGUIModule = ClickGUIModule.getInstance();
+        modules.put("Click GUI", clickGUIModule);
+
+        // Register keybindings
+        if (sprintModule.getKey() != -1) {
+            String keyId = "key.tttmod." + sprintModule.getName();
+            KeyBinding keyBinding = new KeyBinding(
+                    keyId,
+                    InputUtil.Type.KEYSYM,
+                    sprintModule.getKey(),
+                    KeyInputHandler.KEY_CATEGORY_TTTMOD
+            );
+            KeyBindingHelper.registerKeyBinding(keyBinding);
+            sprintModule.setKeyBinding(keyBinding);
+        }
+
+        if (clickGUIModule.getKey() != -1) {
+            String keyId = "key.tttmod." + clickGUIModule.getName();
+            KeyBinding keyBinding = new KeyBinding(
+                    keyId,
+                    InputUtil.Type.KEYSYM,
+                    clickGUIModule.getKey(),
+                    KeyInputHandler.KEY_CATEGORY_TTTMOD
+            );
+            KeyBindingHelper.registerKeyBinding(keyBinding);
+            clickGUIModule.setKeyBinding(keyBinding);
+        }
+
+        // Register event handlers
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.world != null) {
+                for (Module module : modules.values()) {
+                    KeyBinding keyBinding = module.getKeyBinding();
+                    if (keyBinding != null) {
+                        if (keyBinding.wasPressed()) {
+                            module.handleKeyInput();
+                        } else if (module.getMode().equals("hold") && !keyBinding.isPressed()) {
+                            module.setEnabled(false);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 
     public static ModuleManager getInstance() {
         if (instance == null) {
@@ -28,15 +88,9 @@ public class ModuleManager {
         Module module = getModule(name);
         if (module != null) {
             module.setEnabled(true);
-
-            // Nur registrieren, wenn der Keybind nicht -1 ist
-            if (module.getToggleKey() != -1) {
-                KeyInputHandler.register(module, module.getToggleKey());
-            }
-
-            // Nur registrieren, wenn der Keybind nicht -1 ist
-            if (module.getHoldKey() != -1) {
-                KeyInputHandler.register(module, module.getHoldKey());
+            ClientPlayerEntity player = MinecraftClient.getInstance().player;
+            if (player != null) {
+                MinecraftClient.getInstance().player.sendMessage(Text.of("[TTTMod] Das Module " + module.getName() + " wurde aktiviert"), false);
             }
         }
     }
@@ -45,25 +99,35 @@ public class ModuleManager {
         Module module = getModule(name);
         if (module != null) {
             module.setEnabled(false);
+            ClientPlayerEntity player = MinecraftClient.getInstance().player;
+            if (player != null) {
+                MinecraftClient.getInstance().player.sendMessage(Text.of("[TTTMod] Das Module " + module.getName() + " wurde deaktiviert"), false);
+            }
         }
     }
 
-    public void setModuleToggleKey(String name, int keybind) {
+    public void setModuleMode(String name, String mode) {
         Module module = getModule(name);
         if (module != null) {
-            module.setToggleKey(keybind);
+            module.setMode(mode);
         }
     }
 
-    public void setModuleHoldKey(String name, int keybind) {
-        Module module = getModule(name);
+    public void updateModuleKey(String moduleName, String newKeyLetter) {
+        Module module = getModule(moduleName);
         if (module != null) {
-            module.setHoldKey(keybind);
+            InputUtil.Key key = InputUtil.fromTranslationKey("key.keyboard." + newKeyLetter);
+            module.getKeyBinding().setBoundKey(key);
+            KeyBinding.updateKeysByCode(); // Stellt sicher, dass die Änderung angewendet wird
         }
     }
+
 
     public Module getModule(String name) {
         return modules.get(name);
     }
 
+    public Collection<Module> getAllModules() {
+        return modules.values();
+    }
 }

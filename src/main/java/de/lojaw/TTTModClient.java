@@ -7,6 +7,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -16,7 +17,7 @@ import org.lwjgl.glfw.GLFW;
 public class TTTModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        KeyInputHandler.registerKeyInputs();
+        ModuleManager.getInstance().registerModulesAndKeybindings();
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             if (!client.isInSingleplayer()) {
@@ -102,10 +103,9 @@ public class TTTModClient implements ClientModInitializer {
 
         switch (mode) {
             case "toggle":
-                module.setToggleKey(key);
-                break;
             case "hold":
-                module.setHoldKey(key);
+                ModuleManager.getInstance().updateModuleKey(moduleName, letter);
+                module.setMode(mode);
                 break;
             default:
                 sendMessageToPlayer(player, "[TTTMod] Unbekannter Modus " + mode + ". Verfügbare Modi sind 'toggle' und 'hold'.", Formatting.RED);
