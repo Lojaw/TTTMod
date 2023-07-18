@@ -4,6 +4,7 @@ public enum Category {
     MOVEMENT,
     WORLD,
     GUI,
-    RENDER
+    RENDER,
+    RESET
     // Andere Kategorien...
 }

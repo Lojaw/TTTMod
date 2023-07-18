@@ -15,9 +15,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ModuleManager {
     private static ModuleManager instance;
@@ -161,6 +159,20 @@ public class ModuleManager {
 
     public Module getModule(String name) {
         return modules.get(name);
+    }
+
+    public Map<Category, List<Module>> getModulesByCategory() {
+        Map<Category, List<Module>> map = new HashMap<>();
+
+        for (Module module : getAllModules()) {
+            if (!map.containsKey(module.getCategory())) {
+                map.put(module.getCategory(), new ArrayList<>());
+            }
+
+            map.get(module.getCategory()).add(module);
+        }
+
+        return map;
     }
 
     public Collection<Module> getAllModules() {

@@ -4,9 +4,7 @@
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
 		"ExampleMixin",
-		"PlayerEntityMixin",
-		"SprintMixin",
-		"NoPauseScreenMixin"
+		"SprintMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
