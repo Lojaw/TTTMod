@@ -7,9 +7,6 @@ import de.lojaw.module.ModuleManager;
 import de.lojaw.module.impl.ClickGUIModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
-import net.minecraft.util.Identifier;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.*;
@@ -17,13 +14,17 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
+import org.lwjgl.glfw.GLFW;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ClickGUI extends Screen {
+public class ClickGUI extends Screen implements MouseMotionListener {
     private static ClickGUI instance;
 
 
@@ -32,6 +33,7 @@ public class ClickGUI extends Screen {
 
     // Schritt 1: Felder für die Positionen der Kategorien
     private final Map<Category, Point> categoryPositions = new HashMap<>();
+    private final Map<Module, Boolean> moduleStates = new HashMap<>();
 
     // Schritt 2: Felder für das Ziehen der Kategorien
     private Category draggingCategory = null;
@@ -39,7 +41,6 @@ public class ClickGUI extends Screen {
 
     private ClickGUI() {
         super(Text.of("Click GUI")); /* Titel der GUI, normalerweise ein Text Objekt */
-
 
         // Initialisiere die Positionen der Kategorien
         int x = 15;
@@ -82,19 +83,18 @@ public class ClickGUI extends Screen {
         return ClickGUIModule.getInstance().getShouldPauseGame();
     }
 
-
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         // Zeichne den Hintergrund
         this.renderBackground(matrices);
 
         // Zeichne die Modulkategorien und Module
-        int x = 15;  // Setze die anfängliche x-Position
-        int y = 10;  // Setze die anfängliche y-Position
-
         Map<Category, List<Module>> modulesByCategory = ModuleManager.getInstance().getModulesByCategory();
         for (Category category : modulesByCategory.keySet()) {
             Point pos = categoryPositions.get(category);  // Hole die Position der Kategorie
+
+            int x = pos.x;  // Setze die anfängliche x-Position basierend auf der Position der Kategorie
+            int y = pos.y;  // Setze die anfängliche y-Position basierend auf der Position der Kategorie
 
             // Zeichne Rahmen um die Kategorie
             drawRect(matrices, x - 5, y - 5, 150, 20, 0x80808080);
@@ -106,11 +106,13 @@ public class ClickGUI extends Screen {
             if (!isCategoryOpen(category)) continue;
 
             for (Module module : modulesByCategory.get(category)) {
-                drawStringWithShadow(matrices, this.textRenderer, module.getName(), x, y, 0xFFFFFF, 1.0f);
-                y += 15;
+                // Überprüfe den Status des Moduls und passe das Rendern entsprechend an
+                boolean moduleOpen = moduleStates.getOrDefault(module, true);
+                if (moduleOpen) {
+                    drawStringWithShadow(matrices, this.textRenderer, module.getName(), x, y, 0xFFFFFF, 1.0f);
+                    y += 15;
+                }
             }
-
-            y += 15;  // Füge zusätzlichen Abstand zwischen den Kategorien hinzu
         }
 
         // Zeichne den "Reset Positions"-Button
@@ -120,6 +122,7 @@ public class ClickGUI extends Screen {
 
         super.render(matrices, mouseX, mouseY, delta);
     }
+
 
     public void drawRect(MatrixStack matrices, int x, int y, int width, int height, int color) {
         // Zeichne ein Rechteck mit der angegebenen Position, Größe und Farbe
@@ -149,46 +152,97 @@ public class ClickGUI extends Screen {
     }
 
 
+    private Module clickedModule = null;
+
+    private int clickOffsetX = 0;
+    private int clickOffsetY = 0;
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int x = 15;  // Anfangsposition
-        int y = 10;  // Anfangsposition
+        Category categoryClicked = getClickedCategory(mouseX, mouseY);
 
-        Map<Category, List<Module>> modulesByCategory = ModuleManager.getInstance().getModulesByCategory();
-        for (Category category : modulesByCategory.keySet()) {
-            Point pos = categoryPositions.get(category);
+        // Berechnet die Position des "Reset Positions"-Buttons
+        int resetButtonX = this.width - 150;  // 150 ist die Breite des Buttons
+        int resetButtonY = this.height - 20;  // 20 ist die Höhe des Buttons
 
-            // Prüft, ob der Klick innerhalb des Bereichs der Kategorie liegt
-            if (mouseX >= x - 5 && mouseX <= x + 150 && mouseY >= y - 5 && mouseY <= y + 15) {
-                draggingCategory = category;
-                clickOffset = new Point((int)mouseX - pos.x, (int)mouseY - pos.y);
-                setCategoryOpen(category, !isCategoryOpen(category));
-                return true;
-            }
-            y += 20;
-            if (isCategoryOpen(category)) {
-                y += 15 * modulesByCategory.get(category).size() + 15;
-            }
-        }
-
-        // Prüfen, ob der Klick innerhalb des Bereichs des "Reset Positions"-Buttons liegt
-        int resetButtonX = this.width - 150;
-        int resetButtonY = this.height - 20;
-        int resetButtonWidth = 150;
-        int resetButtonHeight = 20;
-        if (mouseX >= resetButtonX && mouseX <= resetButtonX + resetButtonWidth && mouseY >= resetButtonY && mouseY <= resetButtonY + resetButtonHeight) {
+        // Überprüft, ob der Mausklick innerhalb der Grenzen des "Reset Positions"-Buttons liegt
+        if (mouseX >= resetButtonX && mouseY >= resetButtonY && mouseX <= resetButtonX + 150 && mouseY <= resetButtonY + 20) {
+            // Wenn ja, führe den Reset der Positionen durch
             resetPositions();
             return true;
+        }
+
+        if (categoryClicked != null) {
+            if ((button == GLFW.GLFW_MOUSE_BUTTON_LEFT || button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) && mouseY - categoryPositions.get(categoryClicked).getY() < 20) {
+                if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+                    draggingCategory = categoryClicked;
+                    clickOffset = new Point((int)mouseX - categoryPositions.get(categoryClicked).x, (int)mouseY - categoryPositions.get(categoryClicked).y);
+                } else {
+                    categoryStates.put(categoryClicked, !categoryStates.getOrDefault(categoryClicked, false));
+                }
+                return true;
+            }
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (draggingCategory != null) {
+            int newX = (int)mouseX - clickOffset.x;
+            int newY = (int)mouseY - clickOffset.y;
+
+            int categoryWidth = textRenderer.getWidth(draggingCategory.toString()) + 10; // Breite der Kategorie
+            int categoryHeight = 20; // Höhe der Kategorie
+
+            // Beschränkung der X-Position, um sicherzustellen, dass die Kategorie nicht außerhalb des Fensters verschoben wird
+            assert this.client != null;
+            int windowWidth = this.client.getWindow().getScaledWidth();
+            if (newX < 0) {
+                newX = 0;
+            } else if (newX + categoryWidth > windowWidth) {
+                newX = windowWidth - categoryWidth;
+            }
+
+            // Beschränkung der Y-Position, um sicherzustellen, dass die Kategorie nicht außerhalb des Fensters verschoben wird
+            int windowHeight = this.client.getWindow().getScaledHeight();
+            if (newY < 0) {
+                newY = 0;
+            } else if (newY + categoryHeight > windowHeight) {
+                newY = windowHeight - categoryHeight;
+            }
+
+            // Aktualisieren Sie die Position der Kategorie auf die berechneten Werte
+            categoryPositions.put(draggingCategory, new Point(newX, newY));
+
+            return true;
+        }
+
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         draggingCategory = null;
+        clickOffset = null;
         return super.mouseReleased(mouseX, mouseY, button);
     }
+
+    private Category getClickedCategory(double mouseX, double mouseY) {
+        for (Category category : categoryPositions.keySet()) {
+            Point categoryPos = categoryPositions.get(category);
+            int width = textRenderer.getWidth(category.toString()) + 10;
+            int height = 20;
+            if (mouseX >= categoryPos.x && mouseY >= categoryPos.y && mouseX <= categoryPos.x + width && mouseY <= categoryPos.y + height) {
+                return category;
+            }
+        }
+        return null;
+    }
+
+
+
 
     private void resetPositions() {
         int x = 15;
@@ -198,8 +252,15 @@ public class ClickGUI extends Screen {
             pos.x = x;
             pos.y = y;
             y += 35;  // Ändern Sie dies, um den Abstand zwischen den Kategorien anzupassen
+
+            // Alle Module der Kategorie werden eingeklappt
+            for (Module module : ModuleManager.getInstance().getModulesByCategory().get(category)) {
+                moduleStates.put(module, false);
+            }
         }
     }
+
+
 
 
     private int delayCounter;
@@ -265,4 +326,13 @@ public class ClickGUI extends Screen {
         categoryStates.put(category, open);
     }
 
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
+    }
 }
