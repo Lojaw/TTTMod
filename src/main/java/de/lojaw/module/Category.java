@@ -6,6 +6,7 @@ public enum Category {
     PLAYER,
     MISC,
     RENDER,
+    TTT,
     EXPLOIT
     // Andere Kategorien...
 }

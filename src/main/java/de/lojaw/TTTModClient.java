@@ -1,5 +1,6 @@
 package de.lojaw;
 
+import de.lojaw.discordintegration.PythonRunner;
 import de.lojaw.module.Module;
 import de.lojaw.module.ModuleManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -16,6 +17,14 @@ public class TTTModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ModuleManager.getInstance().registerModulesAndKeybindings();
+
+        PythonRunner.runPythonScript();
+
+        // ShutdownHook hinzufügen
+        Runtime.getRuntime().addShutdownHook(new Thread(PythonRunner::stopPythonProcess));
+
+        // Starten Sie die Methode zum Senden von "alive"-Signalen
+        PythonRunner.sendAliveSignal();
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             //if (!client.isInSingleplayer()) {

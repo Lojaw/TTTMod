@@ -124,7 +124,9 @@ public class ClickGUI extends Screen {
                 // Überprüfe den Status des Moduls und passe das Rendern entsprechend an
                 boolean moduleOpen = moduleStates.getOrDefault(module, true);
                 if (moduleOpen) {
-                    drawStringWithShadow(matrices, this.textRenderer, module.getName(), x, y, 0xFFFFFF, 1.0f);
+                    // Ändere die Farbe des Moduls basierend auf seinem Zustand
+                    int color = module.isEnabled() ? 0x00FF00 : 0xFFFFFF; // Grün für aktiviert, Weiß für deaktiviert
+                    drawStringWithShadow(matrices, this.textRenderer, module.getName(), x, y, color, 1.0f);
                     y += 15;
                 }
             }
