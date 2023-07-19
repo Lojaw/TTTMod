@@ -5,6 +5,7 @@ import de.lojaw.module.Category;
 import de.lojaw.module.Module;
 import de.lojaw.module.ModuleManager;
 import de.lojaw.module.impl.ClickGUIModule;
+import de.lojaw.util.GuiUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ClickGUI extends Screen implements MouseMotionListener {
+public class ClickGUI extends Screen {
     private static ClickGUI instance;
 
 
@@ -45,12 +46,13 @@ public class ClickGUI extends Screen implements MouseMotionListener {
         // Initialisiere die Positionen der Kategorien
         int x = 15;
         int y = 10;
-        // Setzt alle Kategorien beim Start auf geöffnet
+       // Setzt alle Kategorien beim Start auf geschlossen
         for (Category category : Category.values()) {
-            categoryStates.put(category, true);
+            categoryStates.put(category, false); // Jetzt sind alle Kategorien standardmäßig geschlossen
             categoryPositions.put(category, new Point(x, y));
             y += 35;  // Ändern Sie dies, um den Abstand zwischen den Kategorien anzupassen
         }
+
 
     }
 
@@ -160,6 +162,7 @@ public class ClickGUI extends Screen implements MouseMotionListener {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         Category categoryClicked = getClickedCategory(mouseX, mouseY);
+        System.out.println("Clicked category: " + categoryClicked);  // Debugging-Ausgabe
 
         // Berechnet die Position des "Reset Positions"-Buttons
         int resetButtonX = this.width - 150;  // 150 ist die Breite des Buttons
@@ -179,6 +182,7 @@ public class ClickGUI extends Screen implements MouseMotionListener {
                     clickOffset = new Point((int)mouseX - categoryPositions.get(categoryClicked).x, (int)mouseY - categoryPositions.get(categoryClicked).y);
                 } else {
                     categoryStates.put(categoryClicked, !categoryStates.getOrDefault(categoryClicked, false));
+                    System.out.println("Right click detected. New state: " + categoryStates.get(categoryClicked));  // Debugging-Ausgabe
                 }
                 return true;
             }
@@ -197,7 +201,8 @@ public class ClickGUI extends Screen implements MouseMotionListener {
             int categoryHeight = 20; // Höhe der Kategorie
 
             // Beschränkung der X-Position, um sicherzustellen, dass die Kategorie nicht außerhalb des Fensters verschoben wird
-            assert this.client != null;
+            GuiUtils.ensureClientNotNull(this.client);
+
             int windowWidth = this.client.getWindow().getScaledWidth();
             if (newX < 0) {
                 newX = 0;
@@ -221,6 +226,7 @@ public class ClickGUI extends Screen implements MouseMotionListener {
 
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
+
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
@@ -247,26 +253,17 @@ public class ClickGUI extends Screen implements MouseMotionListener {
     private void resetPositions() {
         int x = 15;
         int y = 10;
-        for (Category category : categoryPositions.keySet()) {
-            Point pos = categoryPositions.get(category);
-            pos.x = x;
-            pos.y = y;
+        for (Category category : Category.values()) {
+            categoryStates.put(category, false);
+            categoryPositions.put(category, new Point(x, y));
             y += 35;  // Ändern Sie dies, um den Abstand zwischen den Kategorien anzupassen
-
-            // Alle Module der Kategorie werden eingeklappt
-            for (Module module : ModuleManager.getInstance().getModulesByCategory().get(category)) {
-                moduleStates.put(module, false);
-            }
         }
     }
 
 
 
-
-    private int delayCounter;
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    //@Override
+    /*    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (!this.shouldPause()) {
             assert this.client != null;
             if (this.client.player != null) {
@@ -292,10 +289,10 @@ public class ClickGUI extends Screen implements MouseMotionListener {
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);
-    }
+    }*/
 
-    @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+    //@Override
+    /*public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         if (!this.shouldPause()) {
             assert this.client != null;
             if (this.client.player != null) {
@@ -315,7 +312,7 @@ public class ClickGUI extends Screen implements MouseMotionListener {
         }
 
         return super.keyReleased(keyCode, scanCode, modifiers);
-    }
+    }*/
 
     // Methoden um den Zustand einer Kategorie zu prüfen und zu ändern
     public boolean isCategoryOpen(Category category) {
@@ -324,15 +321,5 @@ public class ClickGUI extends Screen implements MouseMotionListener {
 
     public void setCategoryOpen(Category category, boolean open) {
         categoryStates.put(category, open);
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-
     }
 }

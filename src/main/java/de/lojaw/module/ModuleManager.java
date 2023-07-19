@@ -2,10 +2,7 @@ package de.lojaw.module;
 
 import de.lojaw.event.KeyInputHandler;
 import de.lojaw.gui.clickgui.ClickGUI;
-import de.lojaw.module.impl.ClickGUIModule;
-import de.lojaw.module.impl.FlyModule;
-import de.lojaw.module.impl.FullbrightModule;
-import de.lojaw.module.impl.SprintModule;
+import de.lojaw.module.impl.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
@@ -40,6 +37,9 @@ public class ModuleManager {
 
         FullbrightModule fullbrightModuleModule = new FullbrightModule();
         modules.put("Fullbright", fullbrightModuleModule);
+
+        NoFallModule noFallModule = new NoFallModule();
+        modules.put("NoFall", noFallModule);
 
         // Register keybindings
         if (sprintModule.getKey() != -1) {
@@ -88,6 +88,18 @@ public class ModuleManager {
             );
             KeyBindingHelper.registerKeyBinding(keyBinding);
             fullbrightModuleModule.setKeyBinding(keyBinding);
+        }
+
+        if (noFallModule.getKey() != -1) {
+            String keyId = "key.tttmod." + noFallModule.getName();
+            KeyBinding keyBinding = new KeyBinding(
+                    keyId,
+                    InputUtil.Type.KEYSYM,
+                    noFallModule.getKey(),
+                    KeyInputHandler.KEY_CATEGORY_TTTMOD
+            );
+            KeyBindingHelper.registerKeyBinding(keyBinding);
+            noFallModule.setKeyBinding(keyBinding);
         }
 
         // Register event handlers
