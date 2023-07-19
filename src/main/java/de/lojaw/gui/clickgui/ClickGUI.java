@@ -30,10 +30,10 @@ public class ClickGUI extends Screen {
 
 
     private boolean isOpen = false;
-    private final Map<Category, Boolean> categoryStates = new HashMap<>();
+    private Map<Category, Boolean> categoryStates = new HashMap<>();
 
     // Schritt 1: Felder für die Positionen der Kategorien
-    private final Map<Category, Point> categoryPositions = new HashMap<>();
+    private Map<Category, Point> categoryPositions = new HashMap<>();
     private final Map<Module, Boolean> moduleStates = new HashMap<>();
 
     // Schritt 2: Felder für das Ziehen der Kategorien
@@ -65,12 +65,25 @@ public class ClickGUI extends Screen {
 
     public void open() {
         this.isOpen = true;
+        // Laden Sie den GUI-Zustand
+        // Laden Sie den GUI-Zustand
+        System.out.println("Loading GUI state..."); // Debug output
+        ClickGUIStateManager.GUIState state = ClickGUIStateManager.loadState();
+        System.out.println("GUI state loaded: " + state); // Debug output
+        this.categoryPositions = state.categoryPositions;
+        this.categoryStates = state.categoryStates;
+
         // Code, um die GUI tatsächlich in Minecraft zu öffnen
         MinecraftClient.getInstance().setScreen(this); // öffnet das GUI in Minecraft
     }
 
     public void close() {
         this.isOpen = false;
+        // Speichern Sie den GUI-Zustand
+        System.out.println("Saving GUI state..."); // Debug output
+        ClickGUIStateManager.saveState(this.categoryPositions, this.categoryStates);
+        System.out.println("GUI state saved."); // Debug output
+
         // Code, um die GUI tatsächlich in Minecraft zu schließen
         MinecraftClient.getInstance().setScreen(null); // schließt das aktuelle GUI in Minecraft
     }

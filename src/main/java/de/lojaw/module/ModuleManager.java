@@ -1,7 +1,5 @@
 package de.lojaw.module;
 
-import de.lojaw.event.KeyInputHandler;
-import de.lojaw.gui.clickgui.ClickGUI;
 import de.lojaw.module.impl.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -15,6 +13,8 @@ import net.minecraft.util.math.Vec3d;
 import java.util.*;
 
 public class ModuleManager {
+    public static final String KEY_CATEGORY_TTTMOD = "key.category.tttmod.modules";
+
     private static ModuleManager instance;
 
     private final Map<String, Module> modules = new HashMap<>();
@@ -48,7 +48,7 @@ public class ModuleManager {
                     keyId,
                     InputUtil.Type.KEYSYM,
                     sprintModule.getKey(),
-                    KeyInputHandler.KEY_CATEGORY_TTTMOD
+                    KEY_CATEGORY_TTTMOD
             );
             KeyBindingHelper.registerKeyBinding(keyBinding);
             sprintModule.setKeyBinding(keyBinding);
@@ -60,7 +60,7 @@ public class ModuleManager {
                     keyId,
                     InputUtil.Type.KEYSYM,
                     clickGUIModule.getKey(),
-                    KeyInputHandler.KEY_CATEGORY_TTTMOD
+                    KEY_CATEGORY_TTTMOD
             );
             KeyBindingHelper.registerKeyBinding(keyBinding);
             clickGUIModule.setKeyBinding(keyBinding);
@@ -72,7 +72,7 @@ public class ModuleManager {
                     keyId,
                     InputUtil.Type.KEYSYM,
                     flyModule.getKey(),
-                    KeyInputHandler.KEY_CATEGORY_TTTMOD
+                    KEY_CATEGORY_TTTMOD
             );
             KeyBindingHelper.registerKeyBinding(keyBinding);
             flyModule.setKeyBinding(keyBinding);
@@ -84,7 +84,7 @@ public class ModuleManager {
                     keyId,
                     InputUtil.Type.KEYSYM,
                     fullbrightModuleModule.getKey(),
-                    KeyInputHandler.KEY_CATEGORY_TTTMOD
+                    KEY_CATEGORY_TTTMOD
             );
             KeyBindingHelper.registerKeyBinding(keyBinding);
             fullbrightModuleModule.setKeyBinding(keyBinding);
@@ -96,7 +96,7 @@ public class ModuleManager {
                     keyId,
                     InputUtil.Type.KEYSYM,
                     noFallModule.getKey(),
-                    KeyInputHandler.KEY_CATEGORY_TTTMOD
+                    KEY_CATEGORY_TTTMOD
             );
             KeyBindingHelper.registerKeyBinding(keyBinding);
             noFallModule.setKeyBinding(keyBinding);
