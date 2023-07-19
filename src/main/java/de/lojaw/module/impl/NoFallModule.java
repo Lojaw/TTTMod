@@ -1,39 +1,22 @@
 package de.lojaw.module.impl;
 
-import de.lojaw.gui.clickgui.ClickGUI;
 import de.lojaw.module.Category;
 import de.lojaw.module.Module;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-public class ClickGUIModule implements Module {
+public class NoFallModule implements Module {
 
-    private String name = "Click GUI";
-    private Category category = Category.RENDER;
+    private String name = "NoFall";
+    private Category category = Category.PLAYER;
     private boolean isEnabled = false;
-    private int key = GLFW.GLFW_KEY_B;
+    private int key = GLFW.GLFW_KEY_H;
     private String mode = "toggle";
     private KeyBinding keyBinding;
-
-    private boolean shouldPauseGame = false; // Standardmäßig auf false setzen
-
-    private static ClickGUIModule instance;
-
-    // Privater Konstruktor, um zu verhindern, dass von außerhalb dieser Klasse neue Instanzen erstellt werden
-    private ClickGUIModule() {
-        // Initialisieren Sie Ihre Instanzvariablen hier, wenn Sie welche haben
-    }
-
-    // Öffentliche Methode, um auf die einzige Instanz dieser Klasse zuzugreifen
-    public static ClickGUIModule getInstance() {
-        // Erstellen Sie die Instanz nur, wenn sie noch nicht existiert
-        if (instance == null) {
-            instance = new ClickGUIModule();
-        }
-        // Rückgabe der einzigen Instanz dieser Klasse
-        return instance;
-    }
 
     @Override
     public String getName() {
@@ -62,12 +45,23 @@ public class ClickGUIModule implements Module {
 
     @Override
     public void onEnable() {
-        ClickGUI.getInstance().open();
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if (player != null) {
+            player.getAbilities().flying = true;
+            player.getAbilities().allowFlying = true;
+            player.sendAbilitiesUpdate();
+            player.sendMessage(Text.of("[TTTMod] Das Fly Modul wurde aktiviert"));
+        }
     }
 
     @Override
     public void onDisable() {
-        ClickGUI.getInstance().close();
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if (player != null) {
+            player.getAbilities().flying = false;
+            player.sendAbilitiesUpdate();
+            player.sendMessage(Text.of("[TTTMod] Das Fly Modul wurde deaktiviert"));
+        }
     }
 
     @Override
@@ -106,19 +100,13 @@ public class ClickGUIModule implements Module {
 
     @Override
     public void handleKeyInput() {
-        if (ClickGUI.getInstance().isOpen()) {
-            this.setEnabled(false);
-        } else {
-            this.setEnabled(true);
+        switch (mode) {
+            case "toggle":
+                this.setEnabled(!this.isEnabled());
+                break;
+            case "hold":
+                this.setEnabled(true);
+                break;
         }
     }
-
-    public void setShouldPauseGame(boolean shouldPauseGame) {
-        this.shouldPauseGame = shouldPauseGame;
-    }
-
-    public boolean getShouldPauseGame() {
-        return this.shouldPauseGame;
-    }
-
 }

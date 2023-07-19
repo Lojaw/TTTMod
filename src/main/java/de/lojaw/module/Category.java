@@ -1,10 +1,11 @@
 package de.lojaw.module;
 
 public enum Category {
+    COMBAT,
     MOVEMENT,
-    WORLD,
-    GUI,
+    PLAYER,
+    MISC,
     RENDER,
-    RESET
+    EXPLOIT
     // Andere Kategorien...
 }
