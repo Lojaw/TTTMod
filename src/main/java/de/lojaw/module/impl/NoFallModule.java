@@ -45,23 +45,12 @@ public class NoFallModule implements Module {
 
     @Override
     public void onEnable() {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if (player != null) {
-            player.getAbilities().flying = true;
-            player.getAbilities().allowFlying = true;
-            player.sendAbilitiesUpdate();
-            player.sendMessage(Text.of("[TTTMod] Das Fly Modul wurde aktiviert"));
-        }
+
     }
 
     @Override
     public void onDisable() {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if (player != null) {
-            player.getAbilities().flying = false;
-            player.sendAbilitiesUpdate();
-            player.sendMessage(Text.of("[TTTMod] Das Fly Modul wurde deaktiviert"));
-        }
+
     }
 
     @Override
