@@ -47,27 +47,26 @@ public class ClickGUIModule implements Module {
 
     @Override
     public boolean isEnabled() {
-        return this.isEnabled;
+        return ClickGUI.getInstance().isOpen();
     }
 
     @Override
     public void setEnabled(boolean isEnabled) {
-        this.isEnabled = isEnabled;
         if (isEnabled) {
-            this.onEnable();
+            ClickGUI.getInstance().open();
         } else {
-            this.onDisable();
+            ClickGUI.getInstance().close();
         }
     }
 
     @Override
     public void onEnable() {
-        ClickGUI.getInstance().open();
+        // nothing, currently happens in setsetEnabled(boolean isEnabled)
     }
 
     @Override
     public void onDisable() {
-        ClickGUI.getInstance().close();
+        // nothing, currently happens in setsetEnabled(boolean isEnabled)
     }
 
     @Override

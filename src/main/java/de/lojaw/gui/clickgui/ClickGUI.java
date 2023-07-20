@@ -34,6 +34,7 @@ public class ClickGUI extends Screen {
 
     // Schritt 1: Felder für die Positionen der Kategorien
     private Map<Category, Point> categoryPositions = new HashMap<>();
+    private Map<Module, Point> modulePositions = new HashMap<>();
     private final Map<Module, Boolean> moduleStates = new HashMap<>();
 
     // Schritt 2: Felder für das Ziehen der Kategorien
@@ -127,6 +128,8 @@ public class ClickGUI extends Screen {
                     // Ändere die Farbe des Moduls basierend auf seinem Zustand
                     int color = module.isEnabled() ? 0x00FF00 : 0xFFFFFF; // Grün für aktiviert, Weiß für deaktiviert
                     drawStringWithShadow(matrices, this.textRenderer, module.getName(), x, y, color, 1.0f);
+                    // Speichern Sie die Position des Moduls
+                    modulePositions.put(module, new Point(x, y));
                     y += 15;
                 }
             }
@@ -176,6 +179,15 @@ public class ClickGUI extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+
+        Module moduleClicked = getClickedModule(mouseX, mouseY);
+
+        if (moduleClicked != null) {
+            // Toggle the state of the module
+            moduleClicked.setEnabled(!moduleClicked.isEnabled());
+            return true;
+        }
+
         Category categoryClicked = getClickedCategory(mouseX, mouseY);
         System.out.println("Clicked category: " + categoryClicked);  // Debugging-Ausgabe
 
@@ -262,7 +274,17 @@ public class ClickGUI extends Screen {
         return null;
     }
 
-
+    private Module getClickedModule(double mouseX, double mouseY) {
+        for (Module module : modulePositions.keySet()) {
+            Point modulePos = modulePositions.get(module);
+            int textWidth = this.textRenderer.getWidth(module.getName());  // Breite des Modulnamens
+            int textHeight = 15;  // Ändern Sie dies, um der Höhe Ihrer Modulnamen zu entsprechen
+            if (mouseX >= modulePos.x && mouseY >= modulePos.y && mouseX <= modulePos.x + textWidth && mouseY <= modulePos.y + textHeight) {
+                return module;
+            }
+        }
+        return null;
+    }
 
 
     private void resetPositions() {

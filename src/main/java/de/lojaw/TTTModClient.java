@@ -14,6 +14,9 @@ import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 
 public class TTTModClient implements ClientModInitializer {
+
+    public static boolean isDevMode = true;
+
     @Override
     public void onInitializeClient() {
         ModuleManager.getInstance().registerModulesAndKeybindings();

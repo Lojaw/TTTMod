@@ -41,6 +41,9 @@ public class ModuleManager {
         NoFallModule noFallModule = new NoFallModule();
         modules.put("NoFall", noFallModule);
 
+        ModuleListModule moduleListModule = new ModuleListModule();
+        modules.put("ModuleList", moduleListModule);
+
         // Register keybindings
         if (sprintModule.getKey() != -1) {
             String keyId = "key.tttmod." + sprintModule.getName();
@@ -100,6 +103,18 @@ public class ModuleManager {
             );
             KeyBindingHelper.registerKeyBinding(keyBinding);
             noFallModule.setKeyBinding(keyBinding);
+        }
+
+        if (moduleListModule.getKey() != -1) {
+            String keyId = "key.tttmod." + moduleListModule.getName();
+            KeyBinding keyBinding = new KeyBinding(
+                    keyId,
+                    InputUtil.Type.KEYSYM,
+                    moduleListModule.getKey(),
+                    KEY_CATEGORY_TTTMOD
+            );
+            KeyBindingHelper.registerKeyBinding(keyBinding);
+            moduleListModule.setKeyBinding(keyBinding);
         }
 
         // Register event handlers
@@ -186,6 +201,17 @@ public class ModuleManager {
 
         return map;
     }
+
+    public Collection<Module> getActiveModules() {
+        List<Module> activeModules = new ArrayList<>();
+        for (Module module : modules.values()) {
+            if (module.isEnabled()) {
+                activeModules.add(module);
+            }
+        }
+        return activeModules;
+    }
+
 
     public Collection<Module> getAllModules() {
         return modules.values();

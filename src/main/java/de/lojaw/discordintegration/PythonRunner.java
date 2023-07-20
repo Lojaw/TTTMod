@@ -1,5 +1,7 @@
 package de.lojaw.discordintegration;
 
+import de.lojaw.TTTModClient;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -11,7 +13,12 @@ public class PythonRunner {
     public static void runPythonScript() {
         try {
             String projectDirectory = System.getProperty("user.dir");
-            String pythonScriptPath = projectDirectory + "\\src\\main\\python\\discord_rich_presence.py";
+            String pythonScriptPath;
+            if(TTTModClient.isDevMode)
+                pythonScriptPath = projectDirectory + "\\discord_rich_presence_dev_mode.py";
+            else
+                pythonScriptPath = projectDirectory + "\\discord_rich_presence.py";
+
             String pythonPath = System.getProperty("user.home") + "\\AppData\\Local\\Programs\\Python\\Python311\\python.exe";
 
             ProcessBuilder pb = new ProcessBuilder(pythonPath, pythonScriptPath);
@@ -23,6 +30,19 @@ public class PythonRunner {
                 try {
                     while ((line = bfr.readLine()) != null) {
                         System.out.println(line);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            // Read error stream from Python script
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(pythonProcess.getErrorStream()));
+            new Thread(() -> {
+                String line = "";
+                try {
+                    while ((line = errorReader.readLine()) != null) {
+                        System.err.println(line);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

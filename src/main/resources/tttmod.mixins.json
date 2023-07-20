@@ -5,7 +5,8 @@
 	"mixins": [
 		"ExampleMixin",
 		"SprintMixin",
-		"NoFallMixin"
+		"NoFallMixin",
+		"InGameHudMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
