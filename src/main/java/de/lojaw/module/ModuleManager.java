@@ -51,6 +51,9 @@ public class ModuleManager {
         TabGUIModule tabGUIModule = new TabGUIModule();
         modules.put("TabGUI", tabGUIModule);
 
+        JesusModule jesusModule = new JesusModule();
+        modules.put("Jesus", jesusModule);
+
         // Register keybindings
         if (sprintModule.getKey() != -1) {
             String keyId = "key.tttmod." + sprintModule.getName();
@@ -134,6 +137,18 @@ public class ModuleManager {
             );
             KeyBindingHelper.registerKeyBinding(keyBinding);
             tabGUIModule.setKeyBinding(keyBinding);
+        }
+
+        if (jesusModule.getKey() != -1) {
+            String keyId = "key.tttmod." + jesusModule.getName();
+            KeyBinding keyBinding = new KeyBinding(
+                    keyId,
+                    InputUtil.Type.KEYSYM,
+                    jesusModule.getKey(),
+                    KEY_CATEGORY_TTTMOD
+            );
+            KeyBindingHelper.registerKeyBinding(keyBinding);
+            jesusModule.setKeyBinding(keyBinding);
         }
 
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;

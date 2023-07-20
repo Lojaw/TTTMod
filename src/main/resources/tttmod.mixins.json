@@ -6,7 +6,8 @@
 		"ExampleMixin",
 		"SprintMixin",
 		"NoFallMixin",
-		"InGameHudMixin"
+		"InGameHudMixin",
+		"JesusMixinNew"
 	],
 	"injectors": {
 		"defaultRequire": 1
