@@ -1,14 +1,17 @@
 package de.lojaw.module;
 
+import de.lojaw.gui.tabgui.TabGUI;
 import de.lojaw.module.impl.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
@@ -18,6 +21,7 @@ public class ModuleManager {
     private static ModuleManager instance;
 
     private final Map<String, Module> modules = new HashMap<>();
+    private TabGUI tabGUI;
 
     // Privater Konstruktor, verhindert die Erstellung von Instanzen von außerhalb dieser Klasse
     private ModuleManager() {
@@ -43,6 +47,9 @@ public class ModuleManager {
 
         ModuleListModule moduleListModule = new ModuleListModule();
         modules.put("ModuleList", moduleListModule);
+
+        TabGUIModule tabGUIModule = new TabGUIModule();
+        modules.put("TabGUI", tabGUIModule);
 
         // Register keybindings
         if (sprintModule.getKey() != -1) {
@@ -117,8 +124,25 @@ public class ModuleManager {
             moduleListModule.setKeyBinding(keyBinding);
         }
 
+        if (tabGUIModule.getKey() != -1) {
+            String keyId = "key.tttmod." + tabGUIModule.getName();
+            KeyBinding keyBinding = new KeyBinding(
+                    keyId,
+                    InputUtil.Type.KEYSYM,
+                    tabGUIModule.getKey(),
+                    KEY_CATEGORY_TTTMOD
+            );
+            KeyBindingHelper.registerKeyBinding(keyBinding);
+            tabGUIModule.setKeyBinding(keyBinding);
+        }
+
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+        this.tabGUI = new TabGUI(textRenderer);
+
         // Register event handlers
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            long windowHandle = MinecraftClient.getInstance().getWindow().getHandle();
+
             if (client.world != null) {
                 for (Module module : modules.values()) {
                     KeyBinding keyBinding = module.getKeyBinding();
@@ -128,6 +152,15 @@ public class ModuleManager {
                         } else if (module.getMode().equals("hold") && !keyBinding.isPressed()) {
                             module.setEnabled(false);
                         }
+                    }
+                }
+
+                // Check if the TabGUI module is enabled
+                if (tabGUIModule.isEnabled()) {
+                    if (InputUtil.isKeyPressed(windowHandle, GLFW.GLFW_KEY_UP)) {
+                        this.tabGUI.onKeyPressed(GLFW.GLFW_KEY_UP);  // handle key up
+                    } else if (InputUtil.isKeyPressed(windowHandle, GLFW.GLFW_KEY_DOWN)) {
+                        this.tabGUI.onKeyPressed(GLFW.GLFW_KEY_DOWN);  // handle key down
                     }
                 }
             }

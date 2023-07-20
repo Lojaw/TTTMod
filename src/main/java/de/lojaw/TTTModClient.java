@@ -20,7 +20,6 @@ public class TTTModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ModuleManager.getInstance().registerModulesAndKeybindings();
-
         PythonRunner.runPythonScript();
 
         // ShutdownHook hinzufügen

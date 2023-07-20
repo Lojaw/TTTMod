@@ -20,8 +20,6 @@ public abstract class NoFallMixin extends LivingEntity {
 
     @Shadow public abstract void increaseStat(Identifier stat, int amount);
 
-    private boolean isFallDamageAllowed = false;
-
     protected NoFallMixin() {
         super(null, null);
     }
@@ -38,7 +36,7 @@ public abstract class NoFallMixin extends LivingEntity {
         }
 
         // eigene Logik
-        if (!isFallDamageAllowed) {
+        if (ModuleManager.getInstance().getModule("NoFall").isEnabled()) {
             cir.setReturnValue(false);
             cir.cancel();
             return;
