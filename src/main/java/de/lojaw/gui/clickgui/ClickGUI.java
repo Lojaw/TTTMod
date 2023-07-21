@@ -17,10 +17,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import org.lwjgl.glfw.GLFW;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -297,10 +294,8 @@ public class ClickGUI extends Screen {
         }
     }
 
-
-
-    //@Override
-    /*    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (!this.shouldPause()) {
             assert this.client != null;
             if (this.client.player != null) {
@@ -326,10 +321,10 @@ public class ClickGUI extends Screen {
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);
-    }*/
+    }
 
-    //@Override
-    /*public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         if (!this.shouldPause()) {
             assert this.client != null;
             if (this.client.player != null) {
@@ -349,7 +344,7 @@ public class ClickGUI extends Screen {
         }
 
         return super.keyReleased(keyCode, scanCode, modifiers);
-    }*/
+    }
 
     // Methoden um den Zustand einer Kategorie zu prüfen und zu ändern
     public boolean isCategoryOpen(Category category) {
