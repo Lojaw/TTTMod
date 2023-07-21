@@ -4,12 +4,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -39,16 +41,21 @@ public class PlayerEntityRendererMixin {
 
                 cloak.visible = true;
 
-                VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(playerModel.getLayer(capeTexture));
+                cloak.setPivot(0F, 22.5F, 0F);
 
-                cloak.setPivot(0.0F, 24.0F, -5F); // Setzt die Position des Umhangs auf die Basisposition des Spielers
-                cloak.pitch = (float) Math.PI;
-                cloak.yaw = 0.0F;
-                cloak.roll = 0.0F;
+                double yaw = entity.prevYaw * ((float)Math.PI / 180F);
+                double pitch = entity.prevPitch * ((float)Math.PI / 180F);
+                double roll = 0.0F;  // Je nachdem, wie Sie Ihren Umhang rotieren möchten, möchten Sie vielleicht auch diese Variable anpassen
+
+                // Setzt die Rotation des Umhangs auf die gleiche Rotation wie die des Spielers
+                cloak.setAngles((float) yaw, 0.0F, (float) roll);
+
+                // Beginn des hinzugefügten Render-Codes
+                VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderLayer.getEntitySolid(capeTexture));
+                cloak.render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
+                // Ende des hinzugefügten Render-Codes
 
 
-
-                cloak.render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV);
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
