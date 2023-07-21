@@ -18,18 +18,18 @@ public class TabGUI extends DrawableHelper {
     private static final int UNSELECTED_COLOR = 0xFFFFFF;  // Weiß
     private final TextRenderer textRenderer;
     private final List<Category> categories;
-    private int selectedCategoryIndex;
+    private static int selectedCategoryIndex;
 
     public TabGUI(TextRenderer textRenderer) {
-        System.out.println("Creating a new TabGUI instance");
+        System.out.println("Creating a new TabGUI instance at " + System.currentTimeMillis());
         this.textRenderer = textRenderer;
         this.categories = Arrays.asList(Category.values());
         this.categories.sort(Comparator.comparing(Enum::name)); // Sortiert Kategorien nach Namen
-        this.selectedCategoryIndex = 0;  // Standardmäßig ist die oberste Kategorie ausgewählt
+        //this.selectedCategoryIndex = 0;  // Standardmäßig ist die oberste Kategorie ausgewählt
     }
 
     public void render(MatrixStack matrices) {
-        System.out.println("Rendering with selectedCategoryIndex: " + selectedCategoryIndex);
+        //System.out.println("Rendering with selectedCategoryIndex: " + selectedCategoryIndex);
 
         // Ändern Sie diese Werte nach Ihren Wünschen
         int rectWidth = 100;
@@ -48,7 +48,17 @@ public class TabGUI extends DrawableHelper {
         }
     }
 
+    private long lastKeyPressTime = 0;
+
     public void onKeyPressed(int keyCode) {
+        long now = System.currentTimeMillis();
+        if (now - lastKeyPressTime < 200) {
+            // Weniger als eine Sekunde seit dem letzten Tastendruck vergangen, also nichts tun
+            return;
+        }
+        lastKeyPressTime = now;
+
+        // Rest des Codes...
         if (keyCode == GLFW.GLFW_KEY_UP) {
             System.out.println("Key up pressed!");
             // Bewege die Auswahl nach oben, bleibe aber innerhalb der Grenzen
