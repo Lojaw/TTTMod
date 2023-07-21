@@ -176,13 +176,16 @@ public class ModuleManager {
                         this.tabGUI.onKeyPressed(GLFW.GLFW_KEY_UP);  // handle key up
                     } else if (InputUtil.isKeyPressed(windowHandle, GLFW.GLFW_KEY_DOWN)) {
                         this.tabGUI.onKeyPressed(GLFW.GLFW_KEY_DOWN);  // handle key down
+                    } else if (InputUtil.isKeyPressed(windowHandle, GLFW.GLFW_KEY_RIGHT)) {
+                        this.tabGUI.onKeyPressed(GLFW.GLFW_KEY_RIGHT);  // handle key right
+                    } else if (InputUtil.isKeyPressed(windowHandle, GLFW.GLFW_KEY_LEFT)) {
+                        this.tabGUI.onKeyPressed(GLFW.GLFW_KEY_LEFT);  // handle key left
+                    } else if(InputUtil.isKeyPressed(windowHandle, GLFW.GLFW_KEY_ENTER)) {
+                        this.tabGUI.onKeyPressed(GLFW.GLFW_KEY_ENTER);  // handle key enter
                     }
                 }
             }
         });
-
-
-
     }
 
 
