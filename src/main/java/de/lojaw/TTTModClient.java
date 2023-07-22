@@ -17,6 +17,7 @@ public class TTTModClient implements ClientModInitializer {
 
     public static boolean isDevMode = true;
     public static final String MOD_NAME = "TTT-Mod";
+    public static final String TEST = "Test";
 
     @Override
     public void onInitializeClient() {
