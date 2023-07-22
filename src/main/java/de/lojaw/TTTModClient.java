@@ -16,6 +16,7 @@ import org.lwjgl.glfw.GLFW;
 public class TTTModClient implements ClientModInitializer {
 
     public static boolean isDevMode = true;
+    public static final String MOD_NAME = "TTTMod";
 
     @Override
     public void onInitializeClient() {
