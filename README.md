@@ -8,5 +8,4 @@ commands:
 
 
 
-![grafik](https://github.com/Lojaw/TTTMod/assets/76808882/bc9d97b8-5d72-45fe-93ce-d9bfe7f5afbe)
-
+![2023-07-23_21 03 51](https://github.com/Lojaw/TTTMod/assets/76808882/d4af68e8-f882-40aa-9721-f93303f42b0e)
