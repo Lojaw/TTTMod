@@ -1,5 +1,6 @@
 package de.lojaw;
 
+import com.google.gson.JsonObject;
 import de.lojaw.discordintegration.PythonRunner;
 import de.lojaw.module.Module;
 import de.lojaw.module.ModuleManager;
@@ -12,12 +13,16 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
+import okhttp3.*;
+import java.util.concurrent.*;
+
+import java.io.IOException;
 
 public class TTTModClient implements ClientModInitializer {
 
     public static boolean isDevMode = true;
-    public static final String MOD_NAME = "TTT-Mod";
-    public static final String TEST = "Test";
+    private final OkHttpClient httpClient = new OkHttpClient();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Override
     public void onInitializeClient() {
@@ -137,6 +142,67 @@ public class TTTModClient implements ClientModInitializer {
         }
 
         String nachricht = args[2];
+
+        // Erstellen Sie das JSON-Objekt, das Sie senden möchten
+        JsonObject json = new JsonObject();
+        json.addProperty("username", player.getEntityName());
+        json.addProperty("message", nachricht);
+
+        RequestBody body = RequestBody.create(
+                MediaType.parse("application/json; charset=utf-8"),
+                json.toString());
+
+        Request request = new Request.Builder()
+                .url("http://your_subdomain.com/api_endpoint")
+                .post(body)
+                .build();
+
+        httpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    // Handle response
+                }
+            }
+        });
+    }
+
+    public void startFetchingUpdates() {
+        final Runnable fetchUpdates = new Runnable() {
+            public void run() {
+                Request request = new Request.Builder()
+                        .url("http://your_subdomain.com/api_endpoint")
+                        .get()
+                        .build();
+
+                httpClient.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (!response.isSuccessful()) {
+                            throw new IOException("Unexpected code " + response);
+                        } else {
+                            // Handle response
+                            // Parse the response and display the messages to the users
+                        }
+                    }
+                });
+            }
+        };
+
+        // Fetch updates every 1 seconds
+        final ScheduledFuture<?> fetchUpdatesHandle = scheduler.scheduleAtFixedRate(fetchUpdates, 0, 1, TimeUnit.SECONDS);
     }
 
     private int getKeycodeFromLetter(String letter) {
