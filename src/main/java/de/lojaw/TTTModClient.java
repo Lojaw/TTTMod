@@ -55,6 +55,10 @@ public class TTTModClient implements ClientModInitializer {
                         case "disable":
                             handleDisableCommand(args, player);
                             return false;
+                        case "chat":
+                            handleTTTModChat(args, player);
+                            return false;
+
                         default:
                             if (player != null) {
                                 player.sendMessage(Text.of("[TTTMod] Unbekannter Befehl."), false);
@@ -124,6 +128,15 @@ public class TTTModClient implements ClientModInitializer {
 
         ModuleManager.getInstance().enableModule(moduleName);
         sendMessageToPlayer(player, "[TTTMod] Das Modul " + moduleName + " wurde aktiviert mit " + mode + " Mode.", Formatting.GREEN);
+    }
+
+    private void handleTTTModChat(String[] args, PlayerEntity player) {
+        if (args.length < 3) {
+            sendMessageToPlayer(player, "[TTTMod] Keine Nachricht angegeben.", Formatting.RED);
+            return;
+        }
+
+        String nachricht = args[2];
     }
 
     private int getKeycodeFromLetter(String letter) {
